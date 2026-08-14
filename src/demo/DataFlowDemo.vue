@@ -18,6 +18,14 @@ const log = (msg: string) => {
   if (logs.value.length > 12) logs.value.pop()
 }
 
+// 本页模拟「code=1 表示成功」的后端形态:共享 mock 的增删改接口返回 code=200,
+// 这里将成功响应(code=200)映射为 code=1,业务失败码(如 500)原样保留
+const withCode1 = <A extends any[]>(fn: (...args: A) => Promise<any>) =>
+  async (...args: A): Promise<any> => {
+    const res = await fn(...args)
+    return res?.code === 200 ? { ...res, code: 1 } : res
+  }
+
 const {
   searchParams,
   tableBindings,
@@ -31,15 +39,16 @@ const {
   submitForm,
   handleDialogClose,
   handleBatchDelete,
+  getTableData,
 } = useCrudPage<User>({
   apis: {
     // code=1 表示成功的后端 + 特殊结构 data.list
     list: fetchUserListCode1,
-    add: addUser,
-    update: updateUser,
-    delete: deleteUser,
-    batchDelete: batchDeleteUsers,
-    get: getUser,
+    add: withCode1(addUser),
+    update: withCode1(updateUser),
+    delete: withCode1(deleteUser),
+    batchDelete: withCode1(batchDeleteUsers),
+    get: withCode1(getUser),
   },
   form: {
     initialData: { id: 0, name: '', email: '', status: 1, role: 'user', createTime: '', tags: [] },
@@ -55,7 +64,8 @@ const {
   table: {
     idKey: 'id',
     config: {
-      index: true,
+      selection: true,
+      index: { label: '序号', width: 60, align: 'center' },
       columns: [
         { prop: 'name', label: '名称', minWidth: 100 },
         { prop: 'email', label: '邮箱', minWidth: 180 },
@@ -88,8 +98,12 @@ const {
       log(`isSuccess 触发:code=${res?.code} → ${ok ? '判定成功' : '判定失败'}(自定义 code=1)`)
       return ok
     },
-    onDeleteSuccess: (row) => log(`onDeleteSuccess 触发:已删除「${row.name}」`),
-    onBatchDeleteSuccess: (rows) => log(`onBatchDeleteSuccess 触发:批量删除 ${rows.length} 条`),
+    onDeleteSuccess: (row) => {
+      log(`onDeleteSuccess 触发:已删除「${row.name}」`); getTableData()
+    },
+    onBatchDeleteSuccess: (rows) => {
+      log(`onBatchDeleteSuccess 触发:批量删除 ${rows.length} 条`); getTableData()
+    },
   },
 })
 

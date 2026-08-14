@@ -17,6 +17,7 @@ import {
   Sunny,
   Moon,
   SwitchButton,
+  Box,
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -44,6 +45,10 @@ const currentTitle = computed(() => (route.meta.title as string) || '后台管�
 // 侧边栏折叠
 const collapsed = ref(false)
 const asideWidth = computed(() => (collapsed.value ? '64px' : '220px'))
+
+// 项目地址(顶栏右上角跳转)
+const DEMO_URL = 'https://github.com/YongHangPu/vue3-crud-hooks-demo'
+const LIB_URL = 'https://github.com/YongHangPu/vue3-crud-hooks'
 
 // 暗色模式切换
 const dark = ref(false)
@@ -96,6 +101,14 @@ const toggleDark = () => {
           </div>
         </div>
         <div class="header-right">
+          <a :href="DEMO_URL" target="_blank" rel="noopener" class="repo-chip">
+            <el-icon :size="13"><Link /></el-icon>
+            <span>示例项目</span>
+          </a>
+          <a :href="LIB_URL" target="_blank" rel="noopener" class="repo-chip">
+            <el-icon :size="13"><Box /></el-icon>
+            <span>vue3-crud-hooks</span>
+          </a>
           <el-icon class="dark-btn" @click="toggleDark">
             <Moon v-if="!dark" />
             <Sunny v-else />
@@ -199,6 +212,26 @@ body,
   display: flex;
   align-items: center;
   gap: 16px;
+}
+/* 项目地址胶囊链接 */
+.repo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--el-text-color-regular);
+  background: var(--el-fill-color-light);
+  border: 1px solid var(--el-border-color-lighter);
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.repo-chip:hover {
+  color: var(--el-color-primary);
+  border-color: var(--el-color-primary);
+  background: var(--el-color-primary-light-9);
 }
 .dark-btn {
   font-size: 18px;

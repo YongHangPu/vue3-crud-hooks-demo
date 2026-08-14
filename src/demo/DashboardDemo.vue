@@ -1,7 +1,12 @@
 <script setup lang="ts">
 // 概览页:点击功能卡片通过路由跳转(路由懒加载,进入时才加载对应页面)
 import { useRouter } from 'vue-router'
+import { Link } from '@element-plus/icons-vue'
 const router = useRouter()
+
+// 项目地址
+const REPO_URL = 'https://github.com/YongHangPu/vue3-crud-hooks-demo'
+const LIB_URL = 'https://github.com/YongHangPu/vue3-crud-hooks'
 
 const stats = [
   { label: 'npm 包版本', value: '1.2.0' },
@@ -61,9 +66,18 @@ const tech = ['Vue 3.5', 'Element Plus 2.14', 'Vite 8', 'TypeScript', 'Vitest', 
       <template #header>技术栈与包来源</template>
       <el-tag v-for="t in tech" :key="t" class="tech-tag" effect="plain">{{ t }}</el-tag>
       <p class="tip">
-        本演示项目通过 <code>npm registry</code> 安装 <code>vue3-crud-hooks@1.1.0</code>(非本地 link),
+        本演示项目通过 <code>npm registry</code> 安装 <code>vue3-crud-hooks@1.2.0</code>(非本地 link),
         用于验证真实发布产物在后台管理系统中的完整可用性。
       </p>
+    </el-card>
+
+    <!-- 项目地址 -->
+    <el-card shadow="never" class="links-card">
+      <template #header>项目地址</template>
+      <div class="link-row">
+        <el-link type="primary" :href="REPO_URL" target="_blank" :icon="Link">示例项目仓库</el-link>
+        <el-link type="primary" :href="LIB_URL" target="_blank" :icon="Link">vue3-crud-hooks 库</el-link>
+      </div>
     </el-card>
   </div>
 </template>
@@ -121,6 +135,13 @@ const tech = ['Vue 3.5', 'Element Plus 2.14', 'Vite 8', 'TypeScript', 'Vitest', 
 }
 .tech-card {
   margin-top: 16px;
+}
+.links-card {
+  margin-top: 16px;
+}
+.link-row {
+  display: flex;
+  gap: 24px;
 }
 .tech-tag {
   margin-right: 8px;

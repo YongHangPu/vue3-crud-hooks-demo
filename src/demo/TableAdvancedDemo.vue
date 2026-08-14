@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { useTablePage, CustomTable, useMessage } from 'vue3-crud-hooks'
-import { fetchUserListPlain, batchDeleteUsers } from '../api/mockUser'
+import { useTablePage, useFormDialog, CustomTable, useMessage } from 'vue3-crud-hooks'
+import type { User } from '../api/mockUser'
+import { fetchUserListPlain, batchDeleteUsers, deleteUser, updateUser, updateUserStatus } from '../api/mockUser'
 
 const message = useMessage()
 
@@ -8,7 +9,8 @@ const message = useMessage()
 // - expand 展开行 / 自定义表头 / 自定义单元格插槽 / append 底部插槽
 // - 操作列按钮动态显隐(visible)与禁用(disabled)
 // - selection 跨页多选(reserveSelection + row-key)
-const { tableBindings, selectedIds, handleBatchDelete, deleteLoading } = useTablePage(
+// - 操作列全交互:启用/禁用(改状态并刷新)、编辑(弹窗保存)、删除(确认后删除)
+const { tableBindings, selectedIds, handleBatchDelete, deleteLoading, getTableData } = useTablePage(
   fetchUserListPlain,
   {},
   {
@@ -16,7 +18,7 @@ const { tableBindings, selectedIds, handleBatchDelete, deleteLoading } = useTabl
       // reserveSelection 跨页保留需要 row-key 标识行
       props: { 'row-key': 'id' },
       selection: { reserveSelection: true },
-      index: true,
+      index: { label: '序号', width: 60, align: 'center' },
       columns: [
         { type: 'expand', label: '', width: 40, slotName: 'expand' },
         { prop: 'name', label: '名称', slotName: 'name', minWidth: 100 },
@@ -25,7 +27,7 @@ const { tableBindings, selectedIds, handleBatchDelete, deleteLoading } = useTabl
         {
           type: 'action',
           label: '操作',
-          width: 230,
+          width: 220,
           buttons: [
             {
               btnText: '启用',
@@ -52,17 +54,39 @@ const { tableBindings, selectedIds, handleBatchDelete, deleteLoading } = useTabl
         },
       ],
       // useTablePage 独立使用时自定义事件走此通道
-      onCustomAction: (event: string, row: any) => {
-        if (event === 'enable') message.success(`已启用:${row.name}(演示 visible 动态显隐)`)
-        if (event === 'disable') message.warning(`已禁用:${row.name}(演示 visible 动态显隐)`)
-        if (event === 'edit') message.warning(`编辑 ${row.name}(disabled 演示:禁用状态用户不可点)`)
+      onCustomAction: async (event: string, row: any) => {
+        if (event === 'enable') {
+          await updateUserStatus(row.id, 1)
+          message.success(`已启用「${row.name}」`)
+          getTableData()
+        } else if (event === 'disable') {
+          await updateUserStatus(row.id, 0)
+          message.warning(`已禁用「${row.name}」`)
+          getTableData()
+        } else if (event === 'edit') {
+          openDialog('edit', row)
+        }
       },
     },
   },
-  { batchDeleteApi: batchDeleteUsers }
+  { deleteApi: deleteUser, batchDeleteApi: batchDeleteUsers }
 )
 
+// 编辑弹窗:编辑已有行数据,保存后刷新列表
+const { dialogVisible, dialogMode, formData, formRef, openDialog, submitForm, handleDialogClose, submitLoading } = useFormDialog<User>({
+  initialData: { id: 0, name: '', email: '', status: 1, role: 'user', createTime: '', tags: [] as string[] },
+  idKey: 'id',
+  // 本页仅编辑已有行;addApi 为必填,复用 updateUser
+  addApi: (data: User) => updateUser(data),
+  updateApi: (data: User) => updateUser(data),
+  onAfterSubmit: () => {
+    message.success('保存成功')
+    getTableData()
+  },
+})
 
+// formRef 通过模板 ref="formRef" 绑定到 el-form;此处显式引用以通过 noUnusedLocals 检查
+void formRef
 </script>
 
 <template>
@@ -73,7 +97,7 @@ const { tableBindings, selectedIds, handleBatchDelete, deleteLoading } = useTabl
       show-icon
       type="success"
       title="高级表格列演示"
-      description="expand 展开行 / 自定义表头(#name-header)与单元格插槽 / append 底部插槽 / 操作列按钮按行状态动态显隐(visible)与禁用(disabled) / selection 跨页多选(reserveSelection)"
+      description="expand 展开行 / 自定义表头(#name-header)与单元格插槽 / append 底部插槽 / 操作列按钮按行状态动态显隐(visible)与禁用(disabled) / selection 跨页多选(reserveSelection) / 启用·禁用·编辑·删除 全交互"
     />
     <div class="toolbar">
       <el-tag type="info">跨页已选 {{ selectedIds.length }} 条(翻页后保留)</el-tag>
@@ -108,6 +132,35 @@ const { tableBindings, selectedIds, handleBatchDelete, deleteLoading } = useTabl
         <div class="append-tip">⬇ append 插槽:表格底部自定义区域(本行由插槽渲染)</div>
       </template>
     </CustomTable>
+
+    <!-- 编辑弹窗 -->
+    <el-dialog v-model="dialogVisible" :title="dialogMode === 'edit' ? '编辑用户' : '新增用户'" width="480px">
+      <el-form ref="formRef" :model="formData" label-width="80px">
+        <el-form-item label="名称">
+          <el-input v-model="formData.name" />
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="formData.email" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-radio-group v-model="formData.status">
+            <el-radio :value="1">启用</el-radio>
+            <el-radio :value="0">禁用</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="formData.role">
+            <el-option label="admin" value="admin" />
+            <el-option label="user" value="user" />
+            <el-option label="editor" value="editor" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="handleDialogClose">取消</el-button>
+        <el-button type="primary" :loading="submitLoading" @click="submitForm">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -167,8 +220,10 @@ const { tableBindings, selectedIds, handleBatchDelete, deleteLoading } = useTabl
 .demo-page :deep(.custom-table-container .el-table) {
   flex: none;
 }
+/* 操作列按钮对齐:统一最小宽度并居中,避免因按钮文本宽度不同而参差 */
+.demo-page :deep(.custom-table-container .el-table__cell .el-link),
+.demo-page :deep(.custom-table-container .el-table__cell .el-button) {
+  min-width: 36px;
+  justify-content: center;
+}
 </style>
-
-
-
-

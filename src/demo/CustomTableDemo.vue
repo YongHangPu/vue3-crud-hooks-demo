@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { CustomTable, useTablePage, useMessage } from 'vue3-crud-hooks'
 import type { CustomTableConfig } from 'vue3-crud-hooks'
 import type { User } from '../api/mockUser'
@@ -14,9 +14,10 @@ const page = ref(1)
 const size = ref(10)
 const loading = ref(false)
 
-const config: CustomTableConfig = {
+// 手动用法:config 需为响应式,load 后把 total/currentPage/pageSize 同步进 pagination,分页器才能显示真实总数
+const config = reactive<CustomTableConfig>({
   selection: true,
-  index: true,
+  index: { label: '序号', width: 60, align: 'center' },
   columns: [
     { prop: 'name', label: '名称', minWidth: 100 },
     { prop: 'email', label: '邮箱', minWidth: 180 },
@@ -29,7 +30,7 @@ const config: CustomTableConfig = {
     },
   ],
   pagination: { currentPage: 1, pageSize: 10 },
-}
+})
 
 const load = async () => {
   loading.value = true
@@ -37,6 +38,12 @@ const load = async () => {
   const res = await fetchUserListNested({ pageNum: page.value, pageSize: size.value })
   data.value = res.data.records
   total.value = res.data.total
+  // 同步分页器:总数 + 当前页/每页条数,保证分页组件与数据一致
+  Object.assign(config.pagination as any, {
+    total: total.value,
+    currentPage: page.value,
+    pageSize: size.value,
+  })
   loading.value = false
 }
 load()

@@ -141,6 +141,14 @@ export const updateUser = async (data: Partial<User>) => {
   return { code: 200, message: '更新成功' }
 }
 
+/** 启用/禁用(更新状态) */
+export const updateUserStatus = async (id: number, status: 0 | 1) => {
+  await delay(150)
+  const idx = users.findIndex((u) => u.id === id)
+  if (idx >= 0) users[idx].status = status
+  return { code: 200, message: status === 1 ? '启用成功' : '禁用成功' }
+}
+
 /** 删除 */
 export const deleteUser = async (id: number) => {
   await delay(150)

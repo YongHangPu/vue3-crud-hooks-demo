@@ -61,7 +61,7 @@ const {
     idKey: 'id',
     config: {
       selection: true,
-      index: true,
+      index: { label: '序号', width: 60, align: 'center' },
       columns: [
         { prop: 'name', label: '名称', minWidth: 100 },
         { prop: 'email', label: '邮箱', minWidth: 180 },
