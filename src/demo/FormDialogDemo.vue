@@ -34,7 +34,6 @@ void formRef
 <template>
   <div>
     <el-alert class="demo-tip" :closable="false" show-icon type="info" title="useFormDialog 独立弹窗表单" description="新增 / 编辑(getApi 回显) / 表单校验 / 提交,不依赖表格" />
->
     <el-card shadow="never">
       <p class="hint">useFormDialog 独立使用:弹窗表单的完整流程。编辑模式通过 getApi 回显详情。</p>
       <el-button type="primary" @click="openDialog('add')">打开新增弹窗</el-button>

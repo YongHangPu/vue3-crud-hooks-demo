@@ -122,11 +122,8 @@ body,
 #app {
   height: 100%;
   margin: 0;
-  background: #fff;
-}
-/* 暗色模式全局背景 */
-html.dark body {
-  background: #141414;
+  /* 背景随 Element Plus 变量切换:浅色 #fff / 暗色 html.dark 时自动变暗 */
+  background: var(--el-bg-color);
 }
 </style>
 
@@ -171,7 +168,7 @@ html.dark body {
   background: #1677ff;
 }
 .header {
-  background: #fff;
+  background: var(--el-bg-color);
   display: flex;
   align-items: center;
   justify-content: space-between;

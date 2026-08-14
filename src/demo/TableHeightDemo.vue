@@ -86,7 +86,7 @@ const onPage = (p: { currentPage: number; pageSize: number }) => {
   height: 40px;
   line-height: 40px;
   padding: 0 12px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border-radius: 4px;
   margin-bottom: 8px;
   font-size: 13px;

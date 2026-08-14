@@ -4,6 +4,8 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // GitHub Pages 项目站点路径(https://<user>.github.io/vue3-crud-hooks-demo/)
+  base: '/vue3-crud-hooks-demo/',
   plugins: [vue()],
   resolve: {
     alias: {

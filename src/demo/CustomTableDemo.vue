@@ -70,7 +70,6 @@ const { tableBindings } = useTablePage(specialApi, {}, {
 <template>
   <div>
     <el-alert class="demo-tip" :closable="false" show-icon type="info" title="CustomTable 独立使用 + transformResponse" description="上半:手动 data+config+分页事件对接嵌套响应;下半:useTablePage 配合 transformResponse 解析特殊结构" />
->
     <el-card shadow="never" class="mb">
       <template #header>CustomTable 手动用法(对接嵌套响应,手动解析 data.records)</template>
       <CustomTable

@@ -16,7 +16,6 @@ const onPagination = (p: { currentPage: number; pageSize: number }) => {
 <template>
   <div>
     <el-alert class="demo-tip" :closable="false" show-icon type="info" title="Pagination 组件独立使用" description="defineModel 的 v-model 双向绑定;修改 total / 跳页观察页码重置与超范围行为" />
->
     <el-card shadow="never">
       <template #header>Pagination 组件独立使用(defineModel v-model 双向绑定)</template>
       <Pagination

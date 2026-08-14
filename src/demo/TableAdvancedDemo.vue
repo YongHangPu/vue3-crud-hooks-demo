@@ -136,7 +136,7 @@ const { tableBindings, selectedIds, handleBatchDelete, deleteLoading } = useTabl
   padding: 8px;
   color: #909399;
   font-size: 12px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 </style>
 

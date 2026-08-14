@@ -45,7 +45,6 @@ const checks = [
 <template>
   <div>
     <el-alert class="demo-tip" :closable="false" show-icon type="success" title="子路径导入验证" description="vue3-crud-hooks/xxx 按需导入(tree-shaking),验证子路径产物可用性" />
->
     <el-card shadow="never">
       <template #header>子路径导入验证(tree-shaking 子路径产物)</template>
       <el-table :data="subpaths.map((p, i) => ({ path: p, ok: checks[i] === 'function' || checks[i] === 'object' }))" border>

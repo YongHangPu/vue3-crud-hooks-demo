@@ -55,7 +55,6 @@ const confirm = async () => {
 <template>
   <div>
     <el-alert class="demo-tip" :closable="false" show-icon type="warning" title="useDataTransform 数据转换 + useMessage 消息" description="六种转换:数组/字符串互转、时间范围拆分、空值清理、转数字、深度清理;四种消息:success/error/warning/confirm" />
->
     <el-card shadow="never" class="mb">
       <template #header>useDataTransform 数据转换</template>
       <div class="row">
@@ -99,7 +98,7 @@ const confirm = async () => {
   margin: 0 0 8px;
 }
 .output {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   padding: 12px;
   border-radius: 4px;
   min-height: 80px;
